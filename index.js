@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const morgan = require('morgan');
 const Boss = require('./models/boss');
+const Zone = require('./models/zone');
 const cors = require('cors');
 
 const PORT = process.env.PORT;
@@ -40,9 +41,34 @@ app.post('/api/bosses', (req, res) => {
   });
 });
 
+app.post('/api/zones', (req, res) => {
+  const body = req.body;
+
+  const trimmedName = body.name
+    .toLowerCase()
+    .trim()
+    .replace(/\s/g, '_');
+
+  const zone = new Zone({
+    name: trimmedName,
+    zone: body.zone,
+    background: body.background
+  });
+
+  zone.save().then(savedZone => {
+    res.json(savedZone.toJSON());
+  });
+});
+
 app.get('/api/bosses', (req, res) => {
   Boss.find({}).then(boss => {
     res.send(boss);
+  });
+});
+
+app.get('/api/zones', (req, res) => {
+  Zone.find({}).then(zone => {
+    res.send(zone);
   });
 });
 
